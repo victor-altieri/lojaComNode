@@ -1,4 +1,4 @@
-	import { useState,useEffect } from "react";
+import { useState,useEffect } from "react";
 import axios from 'axios'
 
 const Produto = () => {
@@ -9,6 +9,7 @@ const Produto = () => {
     const [produto, setProduto]=useState([]);
     const [novoProduto, setNovoProduto]=useState({nome:"",descricao:""});
     const [editar, setEditar]=useState(false);
+    const [pesquisar,setPesquisar]=useState("");
 
     // CADASTRAR PRODUTO
     const cadastrarProduto =async ()=>{
@@ -29,23 +30,25 @@ const Produto = () => {
         }
     }
 
-    // HOOK useEffect - EFEITO PARA CARREGAR A LISTAR DE TODOS OS PRODUTOS CADASTRADOS
-
-    useEffect(()=>{
-        consultarProdutos();
-    })
-
     // CONSULTAR PRODUTOS CADASTRADOS
-    const consultarProdutos= async ()=>{
+    const consultarProdutos= async()=>{
         try{
-            const response = await axios.get(API_URL);
+            // VERIFICA SE TROUXE UMA PESQUISA ESPECIFICA SENÃO DEVOLVE A LISTA COM TODOS
+            const url = pesquisar ? `${API_URL}/search?pesquisa=${pesquisar}`:API_URL
+            const response = await axios.get(url);
             setProduto(response.data);
-
         }
         catch(error){
             console.log("Erro ao consultar produto",error)
         }
     }
+
+    
+    // HOOK useEffect - EFEITO PARA CARREGAR A LISTAR DE TODOS OS PRODUTOS CADASTRADOS
+
+    useEffect(()=>{
+        consultarProdutos();
+    })
     
     // ALTERAR PRODUTO CADASTRADO
 
@@ -101,6 +104,16 @@ const Produto = () => {
     <div className="mx-auto p-4">
       <h1 className=" text-2xl font-bold mb-4">Cadastro de Produto</h1>
       <form className="mb-4">
+        <div>
+            <input
+                type="text"
+                placeholder="Pesquisar..."
+                value={pesquisar}
+                onChange={(e)=>setPesquisar(e.target.value)}
+                className="w-[300px] pl-4 pr-4 py-2 border border-gray-400 rounded-full"
+            />
+        </div>
+
         <div className="mb-4">
           <label className=" block text-xl font-medium text-gray-700">Nome Produto</label>
           <input 
